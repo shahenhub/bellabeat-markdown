@@ -1,0 +1,724 @@
+---
+title: "Bellabeat_Case_Study"
+author: "Shahen Halebian"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Introduction
+
+This is a case study included in the Google Data Analytics Professional Certificate hosted by Coursera. This Capstone project is optional to the completion of the certificate program, but I am excited to apply the skills I've learned to the case study.
+
+The six phase analysis process (ask, prepare, process, analyze, share, & act) will help guide me in my analysis of Bellabeat's data and business question.
+
+Bellabeat is a high-tech manufacturer of health-focused products for women. They are a successful small company, but they have the potential to become a larger player in the global smart device market. Urška Sršen, cofounder and Chief Creative Officer of Bellabeat, believes that analyzing smart device fitness data could help unlock new growth opportunities for the company.
+
+The task is to focus on one of Bellabeat’s products and analyze smart device data to gain insight into how consumers are using their smart devices. The insights will then help guide marketing strategy for the company. Finally, present the analysis to the Bellabeat executive team along with high-level recommendations for Bellabeat’s marketing strategy.
+
+
+## Ask Phase
+### Identify The Business Problem/Task
+
+1. Analyzing smart device fitness data to gain insight into how many consumers use their smart devices and to identify fitness and wellness trends.
+
+2. Recommend to stakeholders how to use these trends for targeted advertising to unlock new growth opportunities.
+
+Guiding questions
+
+1. The topics I am exploring are the women’s wellness market through fitness tracker data from Bellabeat.
+
+2. The metrics to be used are from the smart device fitness trackers, specifically FitBit trackers.
+
+3. The stakeholders are:
+    * **Urska Srsen**: Bellabeat’s cofounder and Chief Creative Officer
+    * **Sando Mur**: Mathematician and Bellabeat’s cofounder; key member of the Bellabeat executive team
+    * Bellabeat **Marketing Analytics** Team
+
+4. The audience for this analysis will be top executives at Bellabeat and the marketing team. I will need to adjust my presentation to fit their needs, which may need to be short, to the point, and concise backed up by clear data.
+
+5. This data will help stakeholders by showing them how data trends may help the marketing team grow in certain areas.
+
+6. The insights from the data analysis of Bellabeat’s fitness tracker data can show trends in their products and how the marketing team can use these trends for targeted advertising for new growth opportunities.
+
+
+## Prepare Phase
+### Data Integrity
+
+1. The data is organized into 18 different csv files. Each file contains data on different types of fitness metrics such as daily steps, intensity minutes, heart rate, calories, sleep minutes, etc. It is in long format.
+
+2. There are certain issues with bias and credibility of the data. Using the ROCCC method, these are my findings:
+    * The data may **not be reliable**, as there is no information on the subjects and how the survey was conducted by the original source of data. It also has a small sample base, so it has a **sample selection bias** because it doesn’t reflect the overall population.
+    * The **original** data source is from a survey conducted by Amazon Mechanical Turk.
+    * The data is **not comprehensive**, as it’s missing important information such as data on demographics. The sample size is fairly small for this type of data. It may not be representative of all types of Bellabeat’s consumers.
+    * The data is fairly **current and relative**, as it is only a few years old. However, from the time the data was collected, there have been improvements in data tracking abilities from fitness trackers and other important health and wellness metrics to track and record. This could make the data outdated and not current or relative.
+    * The recorded data is **cited** as it comes from Amazon Mechanical Turk, but we have no information on if this source is credible.
+
+3. This dataset is publicly accepted to be used as it is in the public domain and is easily accessible.
+
+4. I verified the data’s integrity by analyzing the metadata, researching its source and reviewing the data itself. However, the data’s integrity is called into question. There are a couple areas of concern regarding the data’s integrity, such as the trustworthiness of its source, completeness, and potentially being outdated. It also does not provide demographics of the participants, therefore, we cannot verify if the participants were young or old, male or female, which is an issue since Bellabeat is a women's focused health and wellness brand.
+
+5. The data partially helps me answer our business question by providing data that can give us insights on fitness trends.
+
+6. Problems with the data are few. Potentially being outdated, reliability, trustworthiness, and its lack of comprehensiveness.
+
+The **data integrity** of this dataset is in question, and therefore, cannot be a reliable source when making major business decisions by Bellabeat. It will need to be followed up by an analysis of a more reliable data source, preferably data recorded by the company itself. We can ascertain few insights from the data that we do have, but these findings should not be considered reliable for business-making decisions.
+
+
+## Process Phase
+
+I will use RStudio for my analysis of this data. Rstudio will allow me to prepare, process, analyze, visualize, and even share the data all in one system. It can handle large dataframes without causing lag, and has a robust set of tools for the data analysis process. In addition, I can access all data and analyses anywhere I am via the cloud.
+
+I am using three spreadsheets in my analysis process. These spreadsheets are the most adequate and reliable sources for this business task.
+
+### Prepping my script for the analysis process
+I will start by installing and loading packages to begin organizing, preparing and processing the data for analysis.
+
+```{r message=FALSE, warning=FALSE}
+install.packages("tidyverse")
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("lubridate")
+install.packages("tidyr")
+install.packages("rmarkdown")
+install.packages("shiny")
+install.packages("readr")
+install.packages("janitor")
+install.packages("scales")
+install.packages("gridExtra")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(tidyr)
+library(rmarkdown)
+library(shiny)
+library(readr)
+library(janitor)
+library(scales)
+library(gridExtra)
+```
+
+
+Now, I'm going to import and view all relevant csv files for my cleaning and organizing purposes.
+
+Before importing the spreadsheets, I viewed them on Google Sheets to determine which spreadsheets were relevant and which were irrelevant or inadequate to this analysis
+
+The following spreadsheets are deemed adequate for this analysis:
+
+* **Daily Activity** - provides the most amount of activity metrics for every day of the 30 day records for each user
+* **Hourly Calories** - provides data on calories burned for every hour of every day per user
+* **Sleep Day** - provides total sleep time per day per user
+
+All other spreadsheets were not relevant to this study, as they just provided a further (unnecessary) breakdown of the data, did not include a large enough sample size for adequate analysis, or included only a subset of data that was already included in the "Daily Activity" spreadsheet.
+
+
+### Importing the csv files
+
+```{r message=FALSE, warning=FALSE}
+Activity <- read_csv("/cloud/project/Bellabeat_Case_Study_20230123/dailyActivity_merged.csv")
+
+Calories <- read_csv("/cloud/project/Bellabeat_Case_Study_20230123/hourlyCalories_merged.csv")
+
+Sleep <- read_csv("/cloud/project/Bellabeat_Case_Study_20230123/sleepDay_merged.csv")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#Next, I will inspect the data further
+head(Activity)
+head(Calories)
+head(Sleep)
+```
+
+```{r message=FALSE, warning=FALSE}
+glimpse(Activity)
+glimpse(Calories)
+glimpse(Sleep)
+```
+
+
+### Cleaning process
+
+Now for the *Calories* dataframe, I am going to split the "ActivityHour" column (which includes the date, time and AM/PM) into 3 columns, "ActivityDate", "ActivityHour", and "ActivityAMPM"
+
+```{r message=FALSE, warning=FALSE}
+Calories_New <- separate(Calories, col = ActivityHour, into = c("ActivityDate", "ActivityHour", "ActivityAMPM"), sep = " ")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#Next, I will combine "ActivityHour" and "ActivityAMPM" columns into one column.
+CaloriesNew1 <- unite(Calories_New, ActivityHourAMPM, ActivityHour, ActivityAMPM, sep = " ")
+```
+
+For the *Sleep* dataframe, I am going to split the "SleepDay" column (which includes the date, time and AM/PM) into 3 columns, "SleepDate", "SleepHour", and "SleepAMPM", and then remove columns "SleepHour" and "SleepAMPM", since they are the same exact value for each row and have no bearing on the analysis.
+
+```{r message=FALSE, warning=FALSE}
+Sleep_New <- separate(Sleep, col = SleepDay, into = c("SleepDate", "SleepHour", "SleepAMPM"), sep = " ")
+head(Sleep_New)
+```
+
+```{r message=FALSE, warning=FALSE}
+Sleep_New <- Sleep_New[, !(names(Sleep_New) %in% c("SleepHour", "SleepAMPM"))]
+head(Sleep_New)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Now, I will count how many distinct Id numbers there are in each dataframe, to determine the amount of unique participants.
+n_distinct(Activity$Id)
+n_distinct(Sleep_New$Id)
+n_distinct(CaloriesNew1$Id)
+```
+
+We have **33 participants** in both the *Activity* and *Calories* dataframes, and **24 participants** in the *Sleep* dataframe
+
+```{r message=FALSE, warning=FALSE}
+#Now I will determine if there are any duplicate entries.
+sum(duplicated(Activity))
+sum(duplicated(Sleep_New))
+sum(duplicated(CaloriesNew1))
+```
+
+```{r message=FALSE, warning=FALSE}
+#There are **3 duplicate rows** in the *Sleep* dataframe, so we will remove those rows
+distinct(Sleep_New)
+```
+
+```{r message=FALSE, warning=FALSE}
+#I want to make all column names lowercase, to be easier to read and not interfere with any visualizations I may create later on.
+names(Activity) <- tolower(names(Activity))
+names(Sleep_New) <- tolower(names(Sleep_New))
+names(CaloriesNew1) <- tolower(names(CaloriesNew1))
+```
+
+After a short review of the data, there are entries with **1440 Sedentary Minutes**, which is the amount of minutes in a day. This means that participant did not wear the fitness tracker that day. I will remove these entries, as they may skew the analyses
+
+```{r message=FALSE, warning=FALSE}
+Activity_Zero <- subset(Activity, sedentaryminutes<1439)
+```
+
+### Previewing the cleaned data
+
+Now I will summarize the dataframes to get insight on some metrics.
+
+```{r message=FALSE, warning=FALSE}
+summary(Activity_Zero)
+```
+
+The initial insights of Activity:
+
+* Beyond being mostly sedentary throughout the day, **most** participants were **lightly** active throughout the day.
+
+* Surprisingly, there were **more "very active"** minutes & distances logged than "moderately/fairly active" minutes for the same metrics throughout the day.
+
+* There might have been one participant who was extremely active that increased the "very active" metric, since the max minutes/distance is much greater than the max for "moderately active". Further investigation is needed.
+
+* The max number of steps was 36,019, which is roughly equivalent to 16 miles. This person probably participated in a very long activity.
+
+
+## Analyze & Share Phase
+
+First, I would like to show the relationship between moving more (step count) and logging longer distances, and therefore, burning more calories. This isn't 100% correct all the time, as someone can log a very short distance and burn more calories than someone who logs a long distance and burn less calories (intensity of each activity).
+
+```{r message=FALSE, warning=FALSE}
+ggplot(Activity_Zero, aes(x = totalsteps, y = calories, color = totaldistance)) +
+  geom_jitter(width = 0.2)+
+  labs(title="Relationship Between Steps, Distance, & Calories", subtitle = "Total steps per day, distance logged, and correlated burned calories", 
+       x = "Total Steps per Day", y = "Calories Burned")
+```
+
+As you can see from the above plot, there is a **positive relationship** between the steps users take and total distance correlating to greater calorie burn. Generally, the more users move, the further they walk, burning more calories.
+
+We can see that the person who logged in 36,019 steps burned much less calories than a different person who logged in roughly 20,000 steps. This would suggest that the activity was a low intensity activity. These insights can help us determine recommendations for the stakeholders.
+
+```{r message=FALSE, warning=FALSE}
+#Calculating the mean minutes for each activity type.
+veryactivemean <- mean(Activity_Zero$veryactiveminutes)
+fairlyactivemean <- mean(Activity_Zero$fairlyactiveminutes)
+lightlyactivemean <- mean(Activity_Zero$lightlyactiveminutes)
+sedentarymean <- mean(Activity_Zero$sedentaryminutes)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Since we know the average amount of minutes per activity level per day, I will plot a bar chart showing this relationship.
+levels <- c("veryactiveminutes", "fairlyactiveminutes", "lightlyactiveminutes", "sedentaryminutes")
+df1 <- data.frame(activitylevel = factor(levels, levels = levels),
+                  meanminutes = c(23.19, 14.86, 211.2, 948.3))
+```
+
+```{r message=FALSE, warning=FALSE}
+ggplot(df1, aes(x = activitylevel, y = meanminutes)) +
+  geom_col()+
+  labs(title="Average Activity Minutes Per Day", x = "Activity Level", y = "Mean Minutes")
+```
+
+These findings from the chart make sense, as most of the time people will have more sedentary minutes throughout the day than any other type of activity. The interesting finding is that there were more "very active" minutes logged than "fairly active" minutes. This may suggest there may be one or more users who are extremely active that skew the results in that direction. More investigation is needed.
+
+I want to categorize the users in 4 different categories so we can determine the proportion of **very** active, **fairly** active, **lightly** active and **sedentary** users.
+
+We need to create a scale to determine the limits of each activity category. The scale will be based on the data from NIH (https://pubmed.ncbi.nlm.nih.gov/14715035/)
+
+* **Sedentary** = Less than 5000 steps per day
+
+* **Lightly Active** = 5000 to 7499 steps per day
+
+* **Fairly Active** = 7500 to 9999 steps per day
+
+* **Very Active** = More than 10,000 steps per day
+
+```{r message=FALSE, warning=FALSE}
+#First we will need to calculate the daily average steps per day per user.
+Daily_Activity <- Activity_Zero %>% 
+  group_by(id) %>% 
+  summarise(mean_daily_steps = mean(totalsteps), mean_daily_calories = mean(calories))
+
+head(Daily_Activity)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Each distinct user will now be categorized by the criteria we set above.
+User_Type <- Daily_Activity %>% 
+  mutate(user_type = case_when(
+         mean_daily_steps < 5000 ~ "sedentary",
+         mean_daily_steps >= 5000 & mean_daily_steps < 7500 ~ "lightly active",
+         mean_daily_steps >= 7500 & mean_daily_steps < 10000 ~ "fairly active",
+         mean_daily_steps >= 10000 ~ "very active"
+  ))
+
+head(User_Type)   
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#Now we can calculate the proportion of each category of user type. This can help us determine trends from our data.
+User_Type_Percent <- User_Type %>% 
+  group_by(user_type) %>%
+  summarise(total = n()) %>%
+  mutate(totals = sum(total)) %>%
+  group_by(user_type) %>%
+  summarise(total_percent = total / totals) %>%
+  mutate(labels = scales::percent(total_percent))
+
+head(User_Type_Percent)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#Bar cahrt showing the distribution
+ggplot(User_Type_Percent, aes(x = user_type, y = labels))+
+  geom_bar(width = 0.5, stat = "identity", position = "dodge")+
+  labs(title = "User Type Distribution", x = "User Type", y = "Percentage")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#Creating a pie chart for different visualization.
+User_Type_Percent %>%
+  ggplot(aes(x="",y=total_percent, fill=user_type)) +
+  geom_bar(stat = "identity", width = 1)+
+  coord_polar("y", start=0)+
+  theme_minimal()+
+  theme(axis.title.x= element_blank(),
+        axis.title.y = element_blank(),
+        panel.border = element_blank(), 
+        panel.grid = element_blank(), 
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, size=14, face = "bold")) +
+  scale_fill_manual(values = c("#66D450","#ffee65", "#ffa600", "#D84538")) +
+  geom_text(aes(label = labels),
+            position = position_stack(vjust = 0.5))+
+  labs(title="User Type Distribution")
+```
+
+* **33%** of users were "fairly active"
+* **24%** of users were "lightly active"
+* **21%** each for "sedentary" and "very active" users
+
+Now I want to find out what hours of the day users are more active. I will be referencing the *Calories* (CaloriesNew1) dataframe
+
+```{r message=FALSE, warning=FALSE}
+Calories_df <- CaloriesNew1
+```
+
+```{r message=FALSE, warning=FALSE}
+#Creating a new column that contains the full date and time together, then formatting the column.
+Calories_df$date_full <- paste(Calories_df$activitydate, Calories_df$activityhourampm, sep = ' ')
+Calories_df$time <- as.POSIXct(Calories_df$date_full, format =  "%m/%d/%Y %I:%M:%S %p", tz = 'UTC')
+```
+
+```{r message=FALSE, warning=FALSE}
+#Removing the columns I don't need anymore.
+Calories_df <- Calories_df %>% select(-activitydate, -activityhourampm, -date_full)
+```
+
+```{r message=FALSE, warning=FALSE}
+#I will now add a new column that represents a 24 hour time format for each hour variable.
+Calories_df$hour_component <- as.numeric(format(Calories_df$time,'%H'))
+
+head(Calories_df)
+```
+
+```{r message=FALSE, warning=FALSE}
+#I now need to group in ascending order by the 24 hour data, and sum the calories of each row that corresponds to each of the 24 hour components.
+df_total <- Calories_df %>%
+  group_by(hour_component) %>%
+  summarise(calories_total = sum(calories))
+```
+
+```{r message=FALSE, warning=FALSE}
+#Average calories burned per hour of the day.
+df_total_avg <- Calories_df %>%
+  group_by(hour_component) %>%
+  summarise(calories_avg = mean(calories))
+```
+
+```{r message=FALSE, warning=FALSE}
+#I can now plot my findings in a bar chart, so it will show at what hour were users most active. This can provide us with some key takeaways.
+
+#Average calories burned per hour of the day.
+df_total_avg %>%
+  ggplot(aes(x = hour_component, y = calories_avg)) +
+  geom_bar(stat = "identity")+
+  labs(title = "When Are Users Most Active?", subtitle = "Hour of the day that users burn calories the most", 
+       x = "Hour of Day (24-hour format)", y = "Average Calories Burned")+
+  scale_x_continuous(breaks = c(00:23))
+```
+
+#### Some findings from this data:
+
+* Users were **most active** between the evening hours of 5-7pm, right when most people are off of work
+
+* Users were **least active** between midnight and 4am. This time should coincide with when users sleep the most.
+
+* The **second most active** hours were at midday, between noon and 2pm. This may be because many users exercise during their lunch hours or may walk to meetings or travel to areas for lunch
+
+* Active hours from users:
+  * start to **increase** dramatically at 5am
+  * start to **decrease** in the afternoon from 3-5pm
+  * start to **increase** dramatically again from 5-7pm
+  * then **decreasing** dramatically starting from 8pm
+
+#### Key Takeaways:
+
+* Users activity starts to increase at 5am, suggesting users start to vrise from sleep** at that time.
+
+* Users remain **increasingly active** until mid afternoon, after which, peaks from 5pm until 7pm. This suggests most users **exercise or are very active** after work, either doing some sort of activity, or being active moving from their workplace to their homes
+
+* User activity **increases sharply** around noon. This increased acitivity is accepted as most people increase their movement around lunch time.
+
+* Users **are not** very active in the late evening until sleep time. This is generally typical.
+
+* Most users probably **fall asleep** around 11pm, when activity drops considerably.
+
+Next, I want to group the calories burned per day, and then get the average calories burned per day of the week throughout the 30day period.
+
+
+```{r message=FALSE, warning=FALSE}
+calories_avg <- CaloriesNew1
+```
+
+```{r message=FALSE, warning=FALSE}
+#Grouping by the activity date and totaling the calories burned.
+calories_avg_day1 <- calories_avg %>% 
+  group_by(activitydate) %>% 
+  summarise(tot_calories = sum(calories))
+```
+
+```{r message=FALSE, warning=FALSE}
+#Add a new date column and convert the date column from a character string to a date object
+calories_avg_day1$new_date <- mdy(calories_avg_day1$activitydate)
+```
+
+```{r message=FALSE, warning=FALSE}
+#convert that new date column into a weekday column. (I should have done this when I cleaned the files in the Process phase, but I did not anticipate needing to do this)
+calories_avg_day1$weekday <- weekdays(calories_avg_day1$new_date)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Now I can group by the weekday and calculate the average calorie burn per day of the week across all users.
+calories_weekday_avg <- calories_avg_day1 %>% 
+  group_by(weekday) %>% 
+  summarise(total_cal = mean(tot_calories)/33)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Creating a bar chart to visualize the results.
+calories_weekday_avg %>% 
+  ggplot(aes(x = weekday, y = total_cal))+
+  geom_bar(stat = "identity", width = 0.75)+
+  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))+
+  coord_cartesian(ylim = c(1000, 2300))+
+  labs(title = "What Day Are Users Active The Most?", subtitle = "Average calorie burn per day of the week", 
+       x = "Day of Week", y = "Average Calories Burned")
+```
+
+#### Key Takeaways:
+* Users burned the **most calories** on Friday. Saturday came in a close second. This suggests that Friday and Saturday users may be not working as much, and are rather being more active.
+* Users burned the **least calories** on Thursday, suggesting that they were the least active on this particular day of the week.
+
+
+```{r message=FALSE, warning=FALSE}
+#I will now summarize the Sleep data, so I can observe and analyze key data.
+summary(Sleep_New)
+```
+
+#### Key takeaways of the *Sleep* data:
+* **Average sleep** minutes was 419.5 minutes, which equates to 7 hours
+* **Average time in bed** minutes was 458.6, which equates to 7.64 hours, meaning users spent about 40 minutes in bed per night not sleeping
+
+Now I will determine if the proportion of users average sleeping hours is adequate or inadequate.
+The criteria I will use is based off of NIH's recommendations for adults in US and Canada, found here: (https://bit.ly/3jnRVbb)
+
+The ranges I will use are:
+
+* **good** = 7-9+ hours (420-540+ minutes)
+* **satisfactory** = 5-7 hours (300-419 minutes)
+* **poor** = less than 5 hours (<300 minutes)
+
+
+```{r message=FALSE, warning=FALSE}
+#Calculating the average of each days sleeping minutes per user.
+sleep_daily <- Sleep_New %>% 
+  group_by(id) %>% 
+  summarise(mean_daily_sleep = mean(totalminutesasleep))
+
+head(sleep_daily)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Each distinct user will now be categorized by the criteria we set above.
+sleep_type <- sleep_daily %>% 
+  mutate(sleep_quality = case_when(
+    mean_daily_sleep > 420 ~ "good",
+    mean_daily_sleep >= 300 & mean_daily_sleep < 420 ~ "satisfactory",
+    mean_daily_sleep < 300 ~ "poor"
+  ))
+
+head(sleep_type)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Now we can measure the proportion of each category of user type. This can help us determine trends from our data.
+sleep_type_percent <- sleep_type %>% 
+  group_by(sleep_quality) %>% 
+  summarise(total = n()) %>% 
+  mutate(totals = sum(total)) %>% 
+  group_by(sleep_quality) %>% 
+  summarise(total_percent = total / totals) %>% 
+  mutate(labels = scales::percent(total_percent))
+
+head(sleep_type_percent)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Creating bar chart to show the user distribution.
+ggplot(sleep_type_percent, aes(x = sleep_quality, y = labels))+
+  geom_bar(width = 0.5, stat = "identity", position = "dodge")+
+  labs(title = "Sleep Quality Distribution", x = "Sleep Quality", y = "Percent of Users")
+```
+
+```{r message=FALSE, warning=FALSE}
+#Creating pie chart for different type of visualization.
+sleep_type_percent %>%
+  ggplot(aes(x="",y=total_percent, fill=sleep_quality)) +
+  geom_bar(stat = "identity", width = 1)+
+  coord_polar("y", start=0)+
+  theme_minimal()+
+  theme(axis.title.x= element_blank(),
+        axis.title.y = element_blank(),
+        panel.border = element_blank(), 
+        panel.grid = element_blank(), 
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, size=14, face = "bold")) +
+  scale_fill_manual(values = c("#66D450","#ffee65", "#D84538")) +
+  geom_text(aes(label = labels),
+            position = position_stack(vjust = 0.5))+
+  labs(title="Sleep Quality Distribution")
+```
+
+#### Key Takeaways:
+  * As we can see, per night on average: 
+    * **50%** of users had a **good** amount of sleep
+    * **25%** of users had a **satisfactory** amount of sleep
+    * **25%** of users had a **poor** amount of sleep
+  * This could be an area where Bellabeat can help its users to gain more sleep.
+
+
+Now I want to calculate the average minutes of sleep per weekday.
+
+```{r message=FALSE, warning=FALSE}
+sleep_day <- Sleep_New
+```
+
+```{r message=FALSE, warning=FALSE}
+#Adding in new date column.
+sleep_day$new_date <- mdy(sleep_day$sleepdate)
+
+head(sleep_day)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Adding in new weekday column based on the new_date column.
+sleep_day$weekday <- weekdays(sleep_day$new_date)
+
+head(sleep_day)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Totaling the sleep minutes per weekday.
+sleep_day_df <- sleep_day %>% 
+  group_by(weekday) %>% 
+  summarise(sleep_total = sum(totalminutesasleep))
+
+head(sleep_day_df)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Taking the mean sleep minutes per weekday.
+sleep_day_df_avg <- sleep_day %>% 
+  group_by(weekday) %>% 
+  summarise(sleep_total_avg = mean(totalminutesasleep))
+
+head(sleep_day_df_avg)
+```
+
+```{r message=FALSE, warning=FALSE}
+#Creating bar chart to visualize the average sleep minutes per weekday.
+sleep_day_df_avg %>% 
+  ggplot(aes(x = weekday, y = sleep_total_avg))+
+  geom_bar(stat = "identity", width = 0.75)+
+  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))+
+  coord_cartesian(ylim = c(200, 475))+
+  labs(title = "What Day Do Users Sleep The Most?", subtitle = "Average sleep time per day of the week", 
+       x = "Day of Week", y = "Average Hours of Sleep")
+```
+
+#### Key Takeaways:
+  * The above bar graph shows us that on average, users **sleep the most** on Sunday night. This makes sense as typically most people are home Sunday evenings and aren't out very late.
+  * It also shows us that on average, users **sleep the least** on Thursday night, which is coincidentally the day of the week that calories are burned the least.
+  
+
+I would like to show the relationship between total steps vs calories burned in a day.
+
+```{r message=FALSE, warning=FALSE}
+ggplot(data = Activity_Zero)+
+  geom_point(aes(x = totalsteps, y = calories), color = "red")+
+  geom_smooth(aes(x = totalsteps, y = calories), color = "blue")+
+  scale_y_continuous(limits = c(500, 5000))+
+  labs(title = "Relationship Between Steps & Calories", 
+       subtitle = "More steps in a day tends to increase calorie burn", x = "Total Steps", y = "Calories Burned")
+```
+  
+#### Key Takeaways:
+  * There is a **positive** relationship between **steps and calories**, typically the more steps in a day results in more calories burned. 
+  * That's not entirely the case all the time, as sometimes more steps don't result in much more calories burned. Let's investigate more.
+
+I would like to show plots for each activity category (sedentary, light, fair, and active minutes) compared to burned calories. And show all 4 plots on one chart.
+
+
+```{r message=FALSE, warning=FALSE}
+#Set the plotting area into a 2*2 array.
+par(mfrow = c(2,2))
+```
+
+```{r message=FALSE, warning=FALSE}
+#Assigning the four scatter charts using above dataset.
+plot1 <- ggplot(data = Activity_Zero)+
+  geom_point(mapping = aes(x = sedentaryminutes, y = calories, group = 1), color = "red")+
+  geom_smooth(aes(x = sedentaryminutes, y = calories), color = "blue")+
+  labs(title = "Relationship Between Sedentary Activity & Calories Burned", x = "Sedentary Minutes", y = "Calories Burned")+
+  theme(plot.title = element_text(size = 9))+
+  theme(axis.title = element_text(size = 8))
+```
+
+```{r message=FALSE, warning=FALSE}
+plot2 <- ggplot(data = Activity_Zero)+
+  geom_point(mapping = aes(x = lightlyactiveminutes, y = calories, group = 1), color = "orange")+
+  geom_smooth(aes(x = lightlyactiveminutes, y = calories), color = "blue")+
+  labs(title = "Relationship Between Light Activity & Calories Burned", x = "Lightly Active Minutes", y = "Calories Burned")+
+  theme(plot.title = element_text(size = 9))+
+  theme(axis.title = element_text(size = 8))
+```
+
+```{r message=FALSE, warning=FALSE}
+plot3 <- ggplot(data = Activity_Zero)+
+  geom_point(aes(x = fairlyactiveminutes, y = calories, group = 1), color = "yellow")+
+  geom_smooth(aes(x = fairlyactiveminutes, y = calories), color = "blue")+
+  labs(title = "Relationship Between Fair Activity & Calories Burned", x = "Fairly Active Minutes", y = "Calories Burned")+
+  theme(plot.title = element_text(size = 9))+
+  theme(axis.title = element_text(size = 8))
+```
+
+```{r message=FALSE, warning=FALSE}
+plot4 <- ggplot(data = Activity_Zero)+
+  geom_point(aes(x = veryactiveminutes, y = calories, group = 1), color = "green")+
+  geom_smooth(aes(x = veryactiveminutes, y = calories), color = "blue")+
+  labs(title = "Relationship Between High Activity & Calories Burned", x = "Very Active Minutes", y = "Calories Burned")+
+  theme(plot.title = element_text(size = 9))+
+  theme(axis.title = element_text(size = 8))
+```
+
+```{r message=FALSE, warning=FALSE}
+#Use grid.arrange function to put plots in 2*2 array
+grid.arrange(plot1, plot2, plot3, plot4, nrow = 2, ncol=2)
+```
+
+#### Key Takeaways:
+* Most minutes throughout the day are **sedentary** and **lightly active**. The least amount of minutes are **fairly active** and **very active**.
+* As you become **more active**, it takes **less time** to burn the same or similar amount of calories compared to being less active. 
+* For example:
+  * It took most people about **100 to 125 minutes** to burn 4000 calories in the "very active" category.
+  * It took most people about **150 to 350 minutes** to burn the same amount of calories in the "lightly active" category.
+  * And it took most people at least **500 minutes**, and up to about **1200 minutes**, in the "sedentary" category to burn the same amount of calories.
+* This shows that there is a **positive relationship** with calories burned and higher intensity of activity throughout the day.
+* The more **sedentary** and **lightly active** a user is, the less likely they are to burn an increasing amount of calories.
+* Surprisingly, as someone is increasingly more **fairly active**, their calories burned level off or slowly decrease. However, the calories burned increases sharply in the beginning.
+
+
+## Act Phase
+
+Based on my analysis of the data, I will provide recommendations for the Bellabeat Marketing Team on the insights of their customer data, the fitness trends coming from that data, and how to use these trends to target advertising to unlock new growth opportunities.
+
+Before moving forward, I would like to reiterate that I found the dataset to be unreliable, uncomprehensive and biased. It is best for Bellabeat to record their own data through their applications and trackers, or, at the very least, have a dataset that is reliable, unbiased, and comprehensive.
+
+### Recommendations for Bellabeat Marketing Team
+
+1. **Engage with the customers:**
+    * Most people are sedentary throughout the day and log a "fair" or "light" amount of steps daily. We all know that being more active can be beneficial to ones health. This is an area where Bellabeat can engage their audience with the following actions:
+      * Provide **articles, notes, posts, graphics, etc.** on your app that shows the benefits of being more active.
+      * Create a **notification system** on the app that reminds users to be more active at certain intervals throughout the day.
+      * Create a **reward system (badges, free stuff, etc)** in which rewards are given to users who are more active.
+
+2. **Partnering with local restaurants and cafes:**
+    * Users had **peak activity** starting at lunch time and when work ends. As users go to lunch, go home, or go out with friends during these times, this provides an opportunity to **partner** with local restaurants/cafes to bring potential customers to their doors. This would be benefical to both parties involved.
+    * Bellabeat can **notify/market** to users of their app specifically at these times showing the required distance to their local establishments. This will increase the amount of steps for the user, and get more people into the establishments.
+      * For example: *Notification at 4:55pm*: "It's taco tuesday at Taco Mania and it's only 0.3 miles away, that's only 680 steps! Increase your activity **AND** get a great meal!
+
+3. **Educating the importance of sleep:**
+    * **Limit** or **remove notifications** from the hours of 8pm to 5am, as these were the hours of least activity for users, suggesting rest and sleep time.
+    * As half of the users had satisfactory or poor sleeping habits, Bellabeat has the opportunity to **educate their users** about the **importance of sleep** to their health. By sending out marketing emails, quick bite-sized notifications via app or tracker, or doing both, this would keep users intrigued, engaged and educated. Having the ability to customize a users sleep notifications so they can set their waking/sleeping times, would also greatly affect their habits.
+
+4. **Activity ideas and examples to get users engaged:**
+    * Most calories were burned on Friday and Saturday. Providing **activity ideas** and **examples** to users, such as short workout videos, local walking/hiking trails, local exercise groups and meetups, festivals, etc., can help maintain this trend and increase it during other times of the week that weren't as active. A **weekly or monthly email** providing these ideas or events can help with motivation, planning, excitement for exercise, and reducing attrition.
+
+5. **Showing evidence and progress:**
+    * The **positive relationship** between steps and calories can provide evidence to users that **more activity** and **steps** can lead to a healthier lifestyle. Showing the actual **evidence and progress** of users' data can be a great motivator to show how it is benefiting their health and lifestyles.
+    * Providing a **weekly or monthly wrap-up** of the activity a user has logged can give continued motivation for a user to maintain or increase their activity, and to continue using the app. This wrap-up can be sent via email or in the app itself. Being able to share among friends can provide a sense of competition, which can help increase activity as well.
+
+6. **Create a better fitness tracker:**
+    * There were less participants in the sleep dataframe. This could be due to many factors. Making it easier to sleep with a fitness tracker may help more users continue wearing their trackers while they sleep. Bellabeat could create a tracker that is:
+      * More comfortable to wear when sleeping
+      * Limits the bright lights emanating from the tracker
+      * Removes any type of notification while sleeping (ie. vibrations, sounds, lights, etc)
+      * Provide rewards for users who use the tracker while sleeping
+      * Increase battery life
+
+
